@@ -2,6 +2,7 @@ import socket
 from threading import Thread
 
 myList = []
+PEER_SERVER_PORT = 11234
 
 def new_connection(addr, conn):
     data = conn.recv(1024).decode()
@@ -41,10 +42,14 @@ if __name__ == "__main__":
     client_socket = socket.socket()
     client_socket.connect((host, port))
     message = "NOPE"
-    ser = Thread(target = peer_server, args = ((socket.gethostbyname(socket.gethostname()), port)))
+    ser = Thread(target = peer_server, args = ((socket.gethostbyname(socket.gethostname()), PEER_SERVER_PORT)))
     ser.start()
     while message.lower().strip() != "bye":
         match message:
+            case "ADD LIST":
+                client_socket.send(message.encode())
+                data = client_socket.recv(1024).decode()
+                client_socket.send(str(PEER_SERVER_PORT).encode())
             case "GET LIST":
                 client_socket.send(message.encode())
                 data = client_socket.recv(1024).decode()
@@ -53,6 +58,7 @@ if __name__ == "__main__":
             case "HELLO":
                 for i in range(0, len(myList), 2):
                     cle = Thread(target= peer_client, args= (str(myList[i]), myList[i+1]))
+                    cle.start()
             case _:
                 client_socket.send(message.encode())
                 data = client_socket.recv(1024).decode()

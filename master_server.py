@@ -9,9 +9,10 @@ def new_connection(addr, conn):
         print("Receive from client: " + str(data))
         match data:
             case "ADD LIST":
-                if ([addr[0]] + [addr[1]]) not in myList:
-                    myList.append([addr[0]]+[addr[1]])
-                conn.send("Received".encode())
+                conn.send("OK".encode())
+                port = int(conn.recv(1024).decode())
+                if ([addr[0]] + [port]) not in myList:
+                    myList.append([addr[0]]+[port])
             case "GET LIST":
                 conn.send(str(myList).encode())
             case _:
