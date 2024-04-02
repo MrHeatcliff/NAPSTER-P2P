@@ -2,6 +2,7 @@ import socket
 from threading import Thread
 
 myList = []
+PEER_SERVER_IP = '192.168.1.33'
 PEER_SERVER_PORT = 11234
 
 def new_connection(addr, conn):
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     client_socket = socket.socket()
     client_socket.connect((host, port))
     message = "NOPE"
-    ser = Thread(target = peer_server, args = ((socket.gethostbyname(socket.gethostname()), PEER_SERVER_PORT)))
+    ser = Thread(target = peer_server, args = ((PEER_SERVER_IP, PEER_SERVER_PORT)))
     ser.start()
     while message.lower().strip() != "bye":
         match message:
