@@ -1,6 +1,8 @@
 import socket
 from threading import Thread
 
+myList = []
+
 def new_connection(addr, conn):
     data = conn.recv(1024).decode()
     print(data)
@@ -15,6 +17,13 @@ def peer_server(host, port):
         conn, addr = peerServerSocket.accept()
         nconn = Thread(target = new_connection, args = (addr, conn))
         nconn.start()
+
+def peer_client(host, port):
+    client_socket = socket.socket()
+    client_socket.connect((host, port))
+    message = "HELLO"
+    client_socket.send(message.encode())
+    client_socket.recv(1024).decode()
 
 def separate_string(data):
     data = data.replace("[", "")
@@ -32,7 +41,6 @@ if __name__ == "__main__":
     client_socket = socket.socket()
     client_socket.connect((host, port))
     message = "NOPE"
-    my_list = []
     ser = Thread(target = peer_server, args = ((socket.gethostbyname(socket.gethostname()), port)))
     ser.start()
     while message.lower().strip() != "bye":
@@ -40,11 +48,13 @@ if __name__ == "__main__":
             case "GET LIST":
                 client_socket.send(message.encode())
                 data = client_socket.recv(1024).decode()
-                my_list = separate_string(data)
-                print(my_list)
-        client_socket.send(message.encode())
-        data = client_socket.recv(1024).decode()
-
-        print('Received from server: ' + data)
+                myList = separate_string(data)
+                print(myList)
+            case "HELLO":
+                for i in range(0, len(myList), 2):
+                    cle = Thread(target= peer_client, args= (str(myList[i]), myList[i+1]))
+            case _:
+                client_socket.send(message.encode())
+                data = client_socket.recv(1024).decode()
         message = input(" -> ")  # again take input
     client_socket.close()

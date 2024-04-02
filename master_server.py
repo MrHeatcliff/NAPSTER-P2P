@@ -1,20 +1,22 @@
 import socket
 from threading import Thread
 
+myList = []
 
 def new_connection(addr, conn):
-    myList = []
     while True:
         data = conn.recv(1024).decode()
         print("Receive from client: " + str(data))
         match data:
             case "ADD LIST":
                 if ([addr[0]] + [addr[1]]) not in myList:
-                    myList.append([host]+[port])
+                    myList.append([addr[0]]+[addr[1]])
+                conn.send("Received".encode())
             case "GET LIST":
                 conn.send(str(myList).encode())
+            case _:
+                conn.send("Received".encode())
         print(myList)
-        conn.send("Received".encode())
 
 
 def server_program(host, port):
